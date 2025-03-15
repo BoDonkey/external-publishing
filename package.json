@@ -1,0 +1,25 @@
+{
+  "name": "publishing",
+  "version": "1.0.0",
+  "description": "An ApostropheCMS extension for easy publishing of content to sites like dev.to",
+  "keywords": [
+    "ApostropheCMS",
+    "JavaScript",
+    "Publishing"
+  ],
+  "homepage": "https://github.com/BoDonkey/publishing#readme",
+  "bugs": {
+    "url": "https://github.com/BoDonkey/publishing/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BoDonkey/publishing.git"
+  },
+  "license": "MIT",
+  "author": "Robert Means (BoDonkey)",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
