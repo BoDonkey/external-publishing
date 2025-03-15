@@ -1,5 +1,5 @@
 {
-  "name": "publishing",
+  "name": "@bodonkey/external-publishing",
   "version": "1.0.0",
   "description": "An ApostropheCMS extension for easy publishing of content to sites like dev.to",
   "keywords": [
