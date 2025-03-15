@@ -1,5 +1,5 @@
-const fs = require('node:fs');
-const path = require('node:path');
+import fs from 'node:fs';
+import path from 'node:path';
 
 export default {
   bundle: {
@@ -17,8 +17,8 @@ export default {
 };
 
 function getBundleModuleNames() {
-  const source = path.join(__dirname, './modules');
+  const source = path.join(path.dirname(new URL(import.meta.url).pathname), './modules/@bodonkey');
   return fs.readdirSync(source, { withFileTypes: true })
     .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
+    .map(dirent => `@bodonkey/${dirent.name}`);
 };
