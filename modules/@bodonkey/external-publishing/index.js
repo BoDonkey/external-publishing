@@ -10,7 +10,7 @@ export default {
     self.apos.doc.addContextOperation({
       context: 'update',
       action: 'bodonkeyExternalPublishing',
-      modifiers: [ 'danger' ],
+      modifiers: ['danger'],
       label: 'Publish externally',
       modal: 'ExternalPublishModal',
       // Optional: conditions for when this item should appear

@@ -1,11 +1,6 @@
 <template>
-  <AposModal
-    :modal="modal"
-    :has-errors="hasErrors"
-    @inactive="modal.active = false"
-    @show-modal="modal.showModal = true"
-    :active="modal.active"
-  >
+  <AposModal :modal="modal" :has-errors="hasErrors" @inactive="modal.active = false"
+    @show-modal="modal.showModal = true" :active="modal.active">
     <template #header>
       <div class="apos-modal__header">
         <h2 class="apos-modal__heading">Publish to External Platform</h2>
@@ -21,24 +16,15 @@
         <template v-else>
           <div class="apos-external-publish">
             <div class="apos-external-publish__adapter-select">
-              <AposSelect
-                v-model="selectedProvider"
-                :label="'Platform'"
-                :items="providerItems"
-                :field="{
-                  label: 'Platform',
-                  type: 'select'
-                }"
-              />
+              <AposSelect v-model="selectedProvider" :label="'Platform'" :items="providerItems" :field="{
+                label: 'Platform',
+                type: 'select'
+              }" />
             </div>
 
             <template v-if="selectedProvider && adapterOptions">
               <div class="apos-external-publish__options">
-                <AposSchema
-                  v-if="adapterOptions.fields"
-                  :schema="adapterOptions.fields"
-                  v-model="publishOptions"
-                />
+                <AposSchema v-if="adapterOptions.fields" :schema="adapterOptions.fields" v-model="publishOptions" />
               </div>
             </template>
           </div>
@@ -47,17 +33,9 @@
     </template>
     <template #footer>
       <div class="apos-modal__footer">
-        <AposButton
-          type="default"
-          label="Cancel"
-          @click="modal.active = false"
-        />
-        <AposButton
-          type="primary"
-          label="Publish"
-          :disabled="!selectedProvider || isPublishing || hasErrors"
-          @click="publish"
-        />
+        <AposButton type="default" label="Cancel" @click="modal.active = false" />
+        <AposButton type="primary" label="Publish" :disabled="!selectedProvider || isPublishing || hasErrors"
+          @click="publish" />
       </div>
     </template>
   </AposModal>
@@ -77,7 +55,8 @@ export default {
       publishOptions: {},
       isPublishing: false,
       error: null,
-      hasErrors: false
+      hasErrors: false,
+      canAccess: false
     };
   },
   computed: {
@@ -85,10 +64,12 @@ export default {
       return apos.page.page._id;
     },
     providerItems() {
-      return this.providers.map(provider => ({
+      const items = this.providers.map(provider => ({
         label: provider.label,
         value: provider.name
       }));
+      console.log('providerItems', items);
+      return items;
     }
   },
   watch: {
@@ -103,14 +84,22 @@ export default {
   },
   methods: {
     async fetchProviders() {
+      console.log('Fetching providers');
       try {
-        const response = await apos.http.get('/api/v1/external-publishing/providers');
+        const response = await apos.http.get('/api/v1/@bodonkey/external-publishing/providers');
         console.log('Fetched providers:', response);
         this.providers = response;
       } catch (error) {
         console.error('Error fetching providers:', error);
         this.error = 'Failed to load publishing providers.';
       }
+      this.providers = [
+        {
+          name: 'devto',
+          label: 'DEV.to',
+          publishOptions: { fields: [Object] }
+        }
+      ];
     },
     async fetchProviderOptions(providerName) {
       const provider = this.providers.find(p => p.name === providerName);
@@ -135,8 +124,8 @@ export default {
           options: this.publishOptions
         });
 
-        apos.notify('Successfully published to ' + 
-          this.providers.find(p => p.name === this.selectedProvider).label, { 
+        apos.notify('Successfully published to ' +
+          this.providers.find(p => p.name === this.selectedProvider).label, {
           type: 'success',
           dismiss: true
         });
