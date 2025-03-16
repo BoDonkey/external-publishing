@@ -32,6 +32,7 @@ export default {
        * @param {Object} options - Provider configuration options
        */
       registerProvider(name, options) {
+        console.log('registerProvider', name, options);
         if (self.providers[name]) {
           self.apos.util.warn(`Provider ${name} is already registered`);
           return;
@@ -173,6 +174,7 @@ export default {
       get: {
         // Get all available providers
         async providers(req) {
+          console.log('providers route');
           const providers = self.getEnabledProviders().map(name => {
             const provider = self.providers[name];
             return {
@@ -181,6 +183,7 @@ export default {
               publishOptions: provider.getPublishOptions()
             };
           });
+          console.log('providers', providers);
 
           return providers;
         }

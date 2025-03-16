@@ -3,6 +3,7 @@ export default {
   extend: '@apostrophecms/module',
 
   init(self) {
+    console.log('DEV.to provider module initialized');
     // Register with the external publishing module
     self.apos.modules['@bodonkey/external-publishing'].registerProvider('devto', {
       label: 'DEV.to',

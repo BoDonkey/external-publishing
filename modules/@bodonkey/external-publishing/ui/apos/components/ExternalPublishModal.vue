@@ -105,6 +105,7 @@ export default {
     async fetchProviders() {
       try {
         const response = await apos.http.get('/api/v1/external-publishing/providers');
+        console.log('Fetched providers:', response);
         this.providers = response;
       } catch (error) {
         console.error('Error fetching providers:', error);
@@ -163,14 +164,12 @@ export default {
     }
   },
   async mounted() {
-    // Register event listener for opening the modal
-    apos.bus.$on('external-publish', async () => {
-      await this.fetchProviders();
-      this.modal.active = true;
-    });
+    console.log('ExternalPublishModal mounted');
+    await this.fetchProviders();
+    this.modal.active = true;
   },
   beforeDestroy() {
-    apos.bus.$off('external-publish');
+    apos.bus.$off('contextMenu:bodonkeyExternalPublishing');
   }
 };
 </script>
