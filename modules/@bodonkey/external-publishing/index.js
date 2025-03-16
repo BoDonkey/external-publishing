@@ -1,6 +1,5 @@
-// modules/external-publishing/index.js
 export default {
-  extend: '@apostrophecms/module',
+  extend: '@apostrophecms/page',
   options: {
     alias: 'externalPublishing',
     providers: {}
@@ -8,6 +7,15 @@ export default {
   init(self) {
     self.providers = {};
     self.enabledProviders = [];
+    self.apos.doc.addContextOperation({
+      context: 'update',
+      action: 'bodonkeyExternalPublishing',
+      modifiers: [ 'danger' ],
+      label: 'Publish externally',
+      modal: 'ExternalPublishModal',
+      // Optional: conditions for when this item should appear
+      conditions: ['canPublish'],
+    });
 
     // Register providers configured directly in options
     if (self.options.providers) {
@@ -15,16 +23,6 @@ export default {
         self.registerProvider(name, provider);
       }
     }
-
-    // Add right-side icon button to admin bar
-    const options = {
-      contextUtility: true,
-      icon: 'external-link'
-    }
-    self.apos.adminBar.add(
-      'externalPublish',
-      'External Publishing',
-    );
   },
   methods(self) {
     return {

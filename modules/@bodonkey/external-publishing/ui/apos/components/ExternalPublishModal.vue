@@ -32,7 +32,7 @@
               />
             </div>
 
-            <template v-if="selectedAdapter && providerOptions">
+            <template v-if="selectedProvider && adapterOptions">
               <div class="apos-external-publish__options">
                 <AposSchema
                   v-if="adapterOptions.fields"
@@ -55,7 +55,7 @@
         <AposButton
           type="primary"
           label="Publish"
-          :disabled="!selectedAdapter || isPublishing || hasErrors"
+          :disabled="!selectedProvider || isPublishing || hasErrors"
           @click="publish"
         />
       </div>
@@ -71,8 +71,8 @@ export default {
         active: false,
         showModal: false
       },
-      adapters: [],
-      selectedAdapter: null,
+      providers: [],
+      selectedProvider: null,
       adapterOptions: null,
       publishOptions: {},
       isPublishing: false,
@@ -84,15 +84,15 @@ export default {
     docId() {
       return apos.page.page._id;
     },
-    adapterItems() {
-      return this.adapters.map(adapter => ({
-        label: adapter.label,
-        value: adapter.name
+    providerItems() {
+      return this.providers.map(provider => ({
+        label: provider.label,
+        value: provider.name
       }));
     }
   },
   watch: {
-    selectedAdapter(newValue) {
+    selectedProvider(newValue) {
       if (newValue) {
         this.fetchProviderOptions(newValue);
       } else {
@@ -111,16 +111,16 @@ export default {
         this.error = 'Failed to load publishing providers.';
       }
     },
-    fetchAdapterOptions(providerName) {
-      const adapter = this.adapters.find(a => a.name === adapterName);
-      if (adapter) {
-        this.adapterOptions = adapter.publishOptions;
+    async fetchProviderOptions(providerName) {
+      const provider = this.providers.find(p => p.name === providerName);
+      if (provider) {
+        this.adapterOptions = provider.publishOptions;
         // Reset publish options since schema might be different
         this.publishOptions = {};
       }
     },
     async publish() {
-      if (!this.selectedAdapter || this.isPublishing) {
+      if (!this.selectedProvider || this.isPublishing) {
         return;
       }
 
@@ -129,13 +129,13 @@ export default {
 
       try {
         const result = await apos.http.post('/api/v1/external-publishing/publish', {
-          adapterName: this.selectedAdapter,
+          providerName: this.selectedProvider,
           docId: this.docId,
           options: this.publishOptions
         });
 
         apos.notify('Successfully published to ' + 
-          this.adapters.find(a => a.name === this.selectedAdapter).label, { 
+          this.providers.find(p => p.name === this.selectedProvider).label, { 
           type: 'success',
           dismiss: true
         });
@@ -162,10 +162,10 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     // Register event listener for opening the modal
     apos.bus.$on('external-publish', async () => {
-      await this.fetchAdapters();
+      await this.fetchProviders();
       this.modal.active = true;
     });
   },
