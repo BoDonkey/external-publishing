@@ -4,7 +4,7 @@ export default {
 
   init(self) {
     // Register with the external publishing module
-    self.apos.modules.external-publishing.registerProvider('dev-to', {
+    self.apos.modules['@bodonkey/external-publishing'].registerProvider('devto', {
       label: 'DEV.to',
       module: self,
       publish: self.publish,

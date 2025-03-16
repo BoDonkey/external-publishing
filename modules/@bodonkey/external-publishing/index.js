@@ -24,8 +24,6 @@ export default {
     self.apos.adminBar.add(
       'externalPublish',
       'External Publishing',
-      {},
-      options
     );
   },
   methods(self) {
