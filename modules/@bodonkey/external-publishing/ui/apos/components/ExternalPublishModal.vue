@@ -16,7 +16,11 @@
         <template v-else>
           <div class="apos-external-publish">
             <div class="apos-external-publish__adapter-select">
-              <AposSelect v-model="selectedProvider" :label="'Platform'" :items="providerItems" :field="{
+              <AposSelect
+              v-model="selectedProvider"
+              :label="'Platform'"
+              :choices="providerItems"
+              :field="{
                 label: 'Platform',
                 type: 'select'
               }" />
@@ -86,20 +90,12 @@ export default {
     async fetchProviders() {
       console.log('Fetching providers');
       try {
-        const response = await apos.http.get('/api/v1/@bodonkey/external-publishing/providers');
-        console.log('Fetched providers:', response);
+        const response = await apos.http.get('/api/v1/@bodonkey/external-publishing/providers', {});
         this.providers = response;
       } catch (error) {
         console.error('Error fetching providers:', error);
         this.error = 'Failed to load publishing providers.';
       }
-      this.providers = [
-        {
-          name: 'devto',
-          label: 'DEV.to',
-          publishOptions: { fields: [Object] }
-        }
-      ];
     },
     async fetchProviderOptions(providerName) {
       const provider = this.providers.find(p => p.name === providerName);
