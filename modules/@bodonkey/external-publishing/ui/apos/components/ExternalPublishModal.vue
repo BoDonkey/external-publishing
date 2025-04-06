@@ -16,14 +16,11 @@
         <template v-else>
           <div class="apos-external-publish">
             <div class="apos-external-publish__adapter-select">
-              <AposSelect
-              v-model="selectedProvider"
-              :label="'Platform'"
-              :choices="providerItems"
-              :field="{
-                label: 'Platform',
-                type: 'select'
-              }" />
+              <AposSelect :value=selectedProvider @input="onProviderSelect" :label="'Platform'" :choices="providerItems"
+                :field="{
+                  label: 'Platform',
+                  type: 'select'
+                }" />
             </div>
 
             <template v-if="selectedProvider && adapterOptions">
@@ -68,22 +65,18 @@ export default {
       return apos.page.page._id;
     },
     providerItems() {
-      const items = this.providers.map(provider => ({
-        label: provider.label,
-        value: provider.name
-      }));
+      const items = [
+        { label: 'Select a platform', value: null }
+      ];
+
+      this.providers.forEach(provider => {
+        items.push({
+          label: provider.label,
+          value: provider.name
+        });
+      });
       console.log('providerItems', items);
       return items;
-    }
-  },
-  watch: {
-    selectedProvider(newValue) {
-      if (newValue) {
-        this.fetchProviderOptions(newValue);
-      } else {
-        this.adapterOptions = null;
-        this.publishOptions = {};
-      }
     }
   },
   methods: {
@@ -98,10 +91,18 @@ export default {
       }
     },
     async fetchProviderOptions(providerName) {
+      console.log('Fetching provider options for:', providerName);
+
       const provider = this.providers.find(p => p.name === providerName);
+
       if (provider) {
+        console.log('Provider found:', provider);
         this.adapterOptions = provider.publishOptions;
-        // Reset publish options since schema might be different
+        this.publishOptions = {};
+        this.hasErrors = false;
+      } else {
+        console.log('No provider found for:', providerName);
+        this.adapterOptions = null;
         this.publishOptions = {};
       }
     },
@@ -113,12 +114,17 @@ export default {
       this.isPublishing = true;
       this.error = null;
 
+      const requestData = {
+        providerName: this.selectedProvider,
+        docId: this.docId,
+        options: this.publishOptions
+      };
+
+      console.log('Sending request data:', requestData);
+
+
       try {
-        const result = await apos.http.post('/api/v1/external-publishing/publish', {
-          providerName: this.selectedProvider,
-          docId: this.docId,
-          options: this.publishOptions
-        });
+        const result = await apos.http.post('/external-publishing-api/publish', requestData);
 
         apos.notify('Successfully published to ' +
           this.providers.find(p => p.name === this.selectedProvider).label, {
@@ -140,21 +146,42 @@ export default {
         this.modal.active = false;
       } catch (error) {
         console.error('Error publishing:', error);
+
+        console.log('Request data that failed:', requestData);
         const message = error.response?.body?.message || 'Failed to publish content.';
         apos.notify(message, { type: 'error', dismiss: true });
         this.error = message;
       } finally {
         this.isPublishing = false;
       }
-    }
+    },
+    onProviderSelect(event) {
+      const value = event.target ? event.target.value : event;
+      const cleanValue = typeof value === 'string'
+        ? value.replace(/^["'](.*)["']$/, '$1')
+        : value;
+
+      console.log('Provider selected:', { raw: value, clean: cleanValue });
+
+      // Set the clean value
+      this.selectedProvider = cleanValue;
+
+      // Fetch options for the selected provider
+      if (cleanValue) {
+        this.fetchProviderOptions(cleanValue);
+      } else {
+        this.adapterOptions = null;
+        this.publishOptions = {};
+      }
+    },
   },
   async mounted() {
     console.log('ExternalPublishModal mounted');
     await this.fetchProviders();
     this.modal.active = true;
   },
-  beforeDestroy() {
+    beforeDestroy() {
     apos.bus.$off('contextMenu:bodonkeyExternalPublishing');
   }
-};
+}
 </script>

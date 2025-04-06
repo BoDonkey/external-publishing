@@ -190,7 +190,8 @@ export default {
       },
       post: {
         // Publish a document to an external platform
-        async publish(req) {
+        '/external-publishing-api/publish': async function (req) {
+          console.log('req.body', req.body);
           const { providerName, docId, options } = req.body;
 
           if (!providerName || !docId) {
